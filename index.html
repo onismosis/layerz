@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flyer QR Overlay Tool</title>
+    <link rel="stylesheet" href="src/styles.css">
+    <!-- Fabric.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <h1>QR Overlay Tool</h1>
+            <p>Upload an image, overlay a QR code, and export for print.</p>
+        </header>
+
+        <div class="workspace">
+            <aside class="controls">
+                <div class="control-group">
+                    <h3>1. Upload Images</h3>
+                    <label class="file-upload">
+                        <span>Upload Image (Background)</span>
+                        <input type="file" id="bgInput" accept="image/*">
+                    </label>
+                    <label class="file-upload">
+                        <span>Upload QR Code (SVG/PNG)</span>
+                        <input type="file" id="qrInput" accept="image/svg+xml, image/png, image/jpeg">
+                    </label>
+                </div>
+
+                <div class="control-group" id="qrControls" style="opacity: 0.5; pointer-events: none;">
+                    <h3>2. Adjust QR</h3>
+                    
+                    <label for="qrSize">Size (Scale)</label>
+                    <input type="range" id="qrSize" min="0.1" max="2.0" step="0.05" value="0.5">
+                    
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="whitePadding">
+                        <label for="whitePadding">Add White Padding (Quiet Zone)</label>
+                    </div>
+
+                    <div class="padding-size-control" style="display:none; margin-top: 5px;">
+                        <label for="paddingSize">Padding Size (px)</label>
+                        <input type="number" id="paddingSize" value="10" min="0" step="1" style="width: 60px;">
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3>3. Export</h3>
+                    <div class="export-options">
+                        <label for="exportDpi">Export Quality (Multiplier)</label>
+                        <select id="exportDpi">
+                            <option value="1">Screen (1x)</option>
+                            <option value="2">High (2x)</option>
+                            <option value="4" selected>Print (4x)</option>
+                        </select>
+                    </div>
+                    <button id="downloadBtn" class="primary-btn">Download PNG</button>
+                </div>
+
+                <div class="instructions">
+                    <h4>Instructions</h4>
+                    <ul>
+                        <li>Upload background image first.</li>
+                        <li>Upload QR code (SVG recommended for best quality).</li>
+                        <li>Drag to position the QR code.</li>
+                        <li>Use controls to resize or add padding.</li>
+                        <li>Select "Print (4x)" for high-res export.</li>
+                    </ul>
+                </div>
+            </aside>
+
+            <main class="canvas-area">
+                <div class="canvas-wrapper">
+                    <canvas id="c"></canvas>
+                </div>
+                <div class="canvas-info">
+                    <span id="canvasDimensions">No canvas loaded</span>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script src="src/app.js"></script>
+</body>
+</html>
