@@ -1,6 +1,6 @@
 # Image Overlay Tool
 
-A simple, client-side web tool to overlay multiple images (like QR codes, logos, or stickers) onto a background image or flyer. Built with [Fabric.js](http://fabricjs.com/).
+A simple, client-side web tool to overlay multiple images (like QR codes, logos, or stickers) onto a background image. Built with [Fabric.js](http://fabricjs.com/).
 
 ## Features
 
@@ -50,3 +50,20 @@ No build step required. Just serve the files:
 python3 -m http.server
 ```
 ![landing page](./assets/landing_page.png)
+
+## Testing
+
+A test suite is available to verify core functionality (like high-res downloads and zoom compensation) in isolation.
+
+To run the tests:
+
+### Method 1: Local Server (Recommended)
+If you have the server running:
+Open `http://localhost:8000/tests/test_download.html` in your browser.
+
+### Method 2: Direct Open
+Open the file directly from your file manager or via terminal:
+```bash
+open tests/test_download.html
+```
+

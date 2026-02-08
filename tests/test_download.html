@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Download Logic Test</title>
+    <script src="https://cdn.jsdelivr.net/npm/fabric@5.3.0/dist/fabric.min.js"></script>
+</head>
+<body>
+    <h1>Download Logic Test</h1>
+    <p>This test verifies that the Fabric.js export logic works with multipliers.</p>
+    
+    <div style="border:1px solid #ccc; display:inline-block;">
+        <canvas id="c" width="400" height="300"></canvas>
+    </div>
+    
+    <div style="margin-top:20px;">
+        <label>Fake Zoom Level:</label>
+        <select id="zoomSelect">
+            <option value="1">100% (1.0)</option>
+            <option value="0.5">50% (0.5)</option>
+            <option value="0.2">20% (0.2)</option>
+        </select>
+        
+        <label>Export Multiplier:</label>
+        <select id="exportMult">
+            <option value="1">1x</option>
+            <option value="2">2x</option>
+            <option value="4">4x</option>
+        </select>
+        
+        <button id="testBtn">Test Download</button>
+    </div>
+
+    <div id="logs" style="margin-top:20px; font-family:monospace; background:#eee; padding:10px;"></div>
+
+    <script>
+        const canvas = new fabric.Canvas('c');
+        const logDiv = document.getElementById('logs');
+        
+        function log(msg) {
+            logDiv.innerHTML += `<div>${new Date().toLocaleTimeString()} - ${msg}</div>`;
+            console.log(msg);
+        }
+
+        // Add some content
+        const rect = new fabric.Rect({
+            left: 50,
+            top: 50,
+            fill: 'red',
+            width: 100,
+            height: 100
+        });
+        canvas.add(rect);
+        
+        // Add a fake background image (rect)
+        const bg = new fabric.Rect({
+            width: 400,
+            height: 300,
+            fill: '#f0f0f0'
+        });
+        canvas.setBackgroundImage(bg, canvas.renderAll.bind(canvas));
+
+        document.getElementById('testBtn').addEventListener('click', () => {
+            try {
+                log('Starting export test...');
+                
+                const zoom = parseFloat(document.getElementById('zoomSelect').value);
+                const userMult = parseFloat(document.getElementById('exportMult').value);
+                
+                // Simulate app state
+                canvas.setZoom(zoom);
+                canvas.setWidth(400 * zoom);
+                canvas.setHeight(300 * zoom);
+                
+                log(`Canvas Visual State: Zoom=${zoom}, Width=${canvas.width}, Height=${canvas.height}`);
+                
+                // Logic from app.js
+                const effectiveMultiplier = userMult * (1 / zoom);
+                log(`Calculated Effective Multiplier: ${effectiveMultiplier}`);
+                
+                const expectedW = canvas.width * effectiveMultiplier;
+                const expectedH = canvas.height * effectiveMultiplier;
+                log(`Expected Output Size: ${expectedW} x ${expectedH}`);
+                
+                const dataURL = canvas.toDataURL({
+                    format: 'png',
+                    quality: 1,
+                    multiplier: effectiveMultiplier
+                });
+                
+                log(`DataURL generated. Length: ${dataURL.length} chars`);
+                
+                if (dataURL.length < 1000) {
+                     log('ERROR: DataURL seems too short (empty?)');
+                } else {
+                     log('SUCCESS: DataURL generated successfully.');
+                     
+                     // Try to trigger download
+                     const link = document.createElement('a');
+                     link.download = `test-export-${zoom}-${userMult}.png`;
+                     link.href = dataURL;
+                     document.body.appendChild(link);
+                     link.click();
+                     document.body.removeChild(link);
+                     log('Download triggered.');
+                }
+                
+                // Reset for visual sanity
+                canvas.setZoom(1);
+                canvas.setWidth(400);
+                canvas.setHeight(300);
+                
+            } catch (e) {
+                log(`EXCEPTION: ${e.message}`);
+            }
+        });
+    </script>
+</body>
+</html>
