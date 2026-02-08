@@ -49,7 +49,7 @@ No build step required. Just serve the files:
 # Example with Python
 python3 -m http.server
 ```
-![landing page](./assets/landing_page.png)
+![walkthrough](./assets/walkthrough.mp4)
 
 ## Testing
 
