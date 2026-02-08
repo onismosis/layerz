@@ -160,32 +160,57 @@ function updateControlsFromSelection() {
 
 // 4. Export
 downloadBtn.addEventListener('click', () => {
-    if (!bgImage) {
-        alert('Please upload a background image first.');
-        return;
+    try {
+        if (!bgImage) {
+            alert('Please upload a background image first.');
+            return;
+        }
+
+        // Feedback to user
+        const originalText = downloadBtn.textContent;
+        downloadBtn.textContent = 'Processing...';
+        downloadBtn.disabled = true;
+        
+        // Use setTimeout to allow UI to update before heavy processing
+        setTimeout(() => {
+            try {
+                // Deselect everything so selection handles don't show up in export
+                canvas.discardActiveObject();
+                canvas.renderAll();
+
+                const userMultiplier = parseFloat(exportDpiSelect.value) || 1;
+                // Compensate for the view zoom (canvasScale)
+                const effectiveMultiplier = userMultiplier * (1 / canvasScale);
+                
+                console.log(`Export debug: Scale=${canvasScale}, UserMult=${userMultiplier}, EffMult=${effectiveMultiplier}`);
+                console.log(`Est. Size: ${canvas.width * effectiveMultiplier} x ${canvas.height * effectiveMultiplier}`);
+
+                const dataURL = canvas.toDataURL({
+                    format: 'png',
+                    quality: 1,
+                    multiplier: effectiveMultiplier
+                });
+
+                const link = document.createElement('a');
+                link.download = 'image-overlay.png';
+                link.href = dataURL;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            } catch (innerErr) {
+                console.error('Export error:', innerErr);
+                alert('Failed to export image. The resolution might be too high for your browser. Try a lower quality setting.');
+            } finally {
+                downloadBtn.textContent = originalText;
+                downloadBtn.disabled = false;
+            }
+        }, 50);
+
+    } catch (err) {
+        console.error('Setup error:', err);
+        alert('An unexpected error occurred: ' + err.message);
+        downloadBtn.disabled = false;
     }
-    
-    // Deselect everything so selection handles don't show up in export
-    canvas.discardActiveObject();
-    canvas.renderAll();
-
-    const userMultiplier = parseFloat(exportDpiSelect.value);
-    // Compensate for the view zoom (canvasScale)
-    // If zoom is 0.5 (view is half size), we need 2x multiplier just to get back to 1x original
-    const effectiveMultiplier = userMultiplier * (1 / canvasScale);
-    
-    const dataURL = canvas.toDataURL({
-        format: 'png',
-        quality: 1,
-        multiplier: effectiveMultiplier
-    });
-
-    const link = document.createElement('a');
-    link.download = 'flyer-overlay.png';
-    link.href = dataURL;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
 });
 
 // --- Helper Functions ---
